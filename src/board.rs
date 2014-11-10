@@ -1,10 +1,10 @@
 use std::rand::Rng;
 use std::rand;
 
+pub enum GameError { Wall, Suicide }
+
 #[deriving(PartialEq)]
 pub enum Direction { Up, Down, Left, Right }
-
-pub enum Status { Running, Error }
 
 #[deriving(PartialEq)]
 pub struct Position {
@@ -13,7 +13,7 @@ pub struct Position {
 }
 
 impl Position {
-    fn step (&mut self, dir: &Direction) -> Position {
+    fn next (&self, dir: &Direction) -> Position {
         let mut dx = 0;
         let mut dy = 0;
 
@@ -39,6 +39,7 @@ pub struct Board {
 }
 
 impl Board {
+
     pub fn new (width: i32, height: i32) -> Board {
         let snake_pos = Position { x: width / 2, y: height / 2 };
         Board {
@@ -53,31 +54,22 @@ impl Board {
         self.snake.direction = dir;
     }
 
-    pub fn tick (&mut self) -> Status {
+    pub fn tick (&mut self) -> Result<(), GameError> {
 
-        //for p in self.snake.segments.iter_mut() {
-            //p.step(&self.snake.direction);
-        //}
+        self.snake.step();
 
-        let new_head = self.snake.segments[0].step(&self.snake.direction);
-        self.snake.segments.insert(0, new_head);
-
-
-        {
-            let snake_head = self.snake.head();
-            if (snake_head.x < 0 || snake_head.x == self.width ||
-                snake_head.y < 0 || snake_head.y == self.height) {
-                return Error;
-            }
-        }
-
-        if self.snake.segments[0] == self.bullet {
+        if self.snake.eats_bullet(self.bullet) {
+            self.snake.grow();
             self.bullet = random_position(&self.width, &self.height);
-        } else {
-            self.snake.segments.pop();
         }
 
-        Running
+        if self.snake.hits_wall(&self.width, &self.height) {
+            Err(Wall)
+        } else if self.snake.hits_itself() {
+            Err(Suicide)
+        } else {
+            Ok(())
+        }
 
     }
 
@@ -92,23 +84,44 @@ impl Board {
 }
 
 struct Snake {
-    length: i32,
     segments: Vec<Position>,
     direction: Direction,
+    popped_segment: Position,
 }
 
 impl Snake {
+
     fn new (pos: Position) -> Snake {
         Snake {
-            length: 1,
             segments: vec!(pos),
             direction: Up,
+            popped_segment: Position { x: 0, y: 0 }
         }
     }
 
-    fn head (&self) -> &Position {
-        &self.segments[0]
+    fn step (&mut self) {
+        let new_head = self.segments[0].next(&self.direction);
+        self.segments.insert(0, new_head);
+        self.popped_segment = self.segments.pop().unwrap();
     }
+
+    fn hits_wall (&self, max_x: &i32, max_y: &i32) -> bool {
+        let head = self.segments[0];
+        head.x < 0 || head.x == *max_x || head.y < 0 || head.y == *max_y
+    }
+
+    fn hits_itself (&self) -> bool {
+        false
+    }
+
+    fn grow (&mut self) {
+        self.segments.push(self.popped_segment);
+    }
+
+    fn eats_bullet (&self, bullet: Position) -> bool {
+        self.segments[0] == bullet
+    }
+
 }
 
 fn random_position (max_x: &i32, max_y: &i32) -> Position {
