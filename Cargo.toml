@@ -1,0 +1,9 @@
+[package]
+
+name = "rust-snake-ncurses"
+version = "0.0.1"
+authors = ["root"]
+
+[dependencies.ncurses]
+
+git = "https://github.com/jeaye/ncurses-rs.git"
