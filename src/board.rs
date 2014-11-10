@@ -111,7 +111,7 @@ impl Snake {
     }
 
     fn hits_itself (&self) -> bool {
-        false
+        self.segments.iter().skip(1).any(|s| *s == self.segments[0] )
     }
 
     fn grow (&mut self) {
