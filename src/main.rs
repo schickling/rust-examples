@@ -3,9 +3,9 @@
 extern crate ncurses;
 
 use ncurses::*;
-use board::*;
+use game::*;
 
-mod board;
+mod game;
 
 fn main()
 {
