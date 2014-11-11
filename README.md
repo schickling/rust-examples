@@ -3,21 +3,26 @@ rust-snake-ncurses
 
 A terminal-based snake game implementation in Rust using ncurses
 
-## Dependencies
-
-### Ubuntu
-
-find what is the latest version of libncurses and install it
-
-```sh
-$ apt-cache search libncurses
-$ sudo apt-get install libncurses5-dev -y
-```
-
 ## Build & Run
 
 ```sh
 $ cargo run
+```
+
+## Dependencies
+
+The recommended way is to use the [nighly rust docker images](https://github.com/schickling/dockerfiles/tree/master/rust)
+
+#### Docker
+
+```sh
+$ docker run --rm -it -v $(pwd):/source schickling/rust
+```
+
+#### Ubuntu
+
+```sh
+$ sudo apt-get install libncurses5-dev -y
 ```
 
 ## Screenshot
