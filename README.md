@@ -22,7 +22,7 @@ $ docker run --rm -it -v $(pwd):/source schickling/rust
 #### Ubuntu
 
 ```sh
-$ sudo apt-get install libncurses5-dev -y
+$ sudo apt-get install libncurses5-dev
 ```
 
 ## Screenshot
