@@ -10,17 +10,18 @@ mod game;
 fn main()
 {
     initscr();
-    cbreak();
-    noecho();
+    cbreak(); // enable <Ctrl+C> to kill game
+    noecho(); // don't show input
     keypad(stdscr, true); // make keys work
     curs_set(CURSOR_INVISIBLE);
-    timeout(100);
+    timeout(100); // tick speed
 
-    let mut screen_height = 0i32;
-    let mut screen_width = 0i32;
-    getmaxyx(stdscr, &mut screen_height, &mut screen_width);
+    //let mut screen_height = 0i32;
+    //let mut screen_width = 0i32;
+    let mut bounds = Vector { x: 0, y: 0};
+    getmaxyx(stdscr, &mut bounds.y, &mut bounds.x);
 
-    let mut board = Board::new(screen_width, screen_height);
+    let mut board = Board::new(bounds);
 
     let mut direction = Up;
 
@@ -28,12 +29,12 @@ fn main()
         erase();
 
         {
-            let bullet = board.get_bullet_position();
+            let bullet = board.get_bullet_vector();
             draw_char(bullet, 'o');
         }
 
         {
-            let segments = board.get_snake_positions();
+            let segments = board.get_snake_vectors();
             for segment in segments.iter() {
                 draw_char(segment, '#');
             }
@@ -53,18 +54,17 @@ fn main()
                 break;
             },
             Ok(_) => (),
-        }
+        };
     }
 
     endwin();
 }
 
-fn draw_char (pos: &Position, c: char) {
+fn draw_char (pos: &Vector, c: char) {
     mvaddch(pos.y, pos.x, c as u32);
 }
 
 fn get_new_direction (prev_dir: Direction) -> Direction {
-
     match getch() {
         KEY_UP if prev_dir != Down => Up,
         KEY_DOWN if prev_dir != Up => Down,
@@ -72,7 +72,6 @@ fn get_new_direction (prev_dir: Direction) -> Direction {
         KEY_RIGHT if prev_dir != Left => Right,
         _ => prev_dir,
     }
-
 }
 
 fn show_text (s: &str) {

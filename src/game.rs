@@ -7,43 +7,48 @@ pub enum GameError { Wall, Suicide }
 pub enum Direction { Up, Down, Left, Right }
 
 #[deriving(PartialEq)]
-pub struct Position {
+pub struct Vector {
     pub x: i32,
     pub y: i32,
 }
 
-impl Position {
-    fn next (&self, dir: &Direction) -> Position {
-        let (dx, dy) = match *dir {
+impl Vector {
+    fn next (&self, dir: Direction) -> Vector {
+        let (dx, dy) = match dir {
             Up => (0, -1),
             Down => (0, 1),
             Left => (-1, 0),
             Right => (1, 0),
         };
 
-        Position {
+        Vector {
             x: self.x + dx,
             y: self.y + dy,
+        }
+    }
+
+    fn random (bounds: Vector) -> Vector {
+        let mut rng = rand::task_rng();
+        Vector {
+            x: rng.gen_range::<i32>(0, bounds.x),
+            y: rng.gen_range::<i32>(0, bounds.y),
         }
     }
 }
 
 pub struct Board {
-    width: i32,
-    height: i32,
+    bounds: Vector,
     snake: Snake,
-    bullet: Position,
+    bullet: Vector,
 }
 
 impl Board {
 
-    pub fn new (width: i32, height: i32) -> Board {
-        let snake_pos = Position { x: width / 2, y: height / 2 };
+    pub fn new (bounds: Vector) -> Board {
         Board {
-            width: width,
-            height: height,
-            snake: Snake::new(snake_pos),
-            bullet: random_position(width, height)
+            bounds: bounds,
+            snake: Snake::new(Vector { x: bounds.x / 2, y: bounds.y / 2 }),
+            bullet: Vector::random(bounds),
         }
     }
 
@@ -57,10 +62,10 @@ impl Board {
 
         if self.snake.eats_bullet(self.bullet) {
             self.snake.grow();
-            self.bullet = random_position(self.width, self.height);
+            self.bullet = Vector::random(self.bounds);
         }
 
-        if self.snake.hits_wall(&self.width, &self.height) {
+        if self.snake.hits_wall(self.bounds) {
             Err(Wall)
         } else if self.snake.hits_itself() {
             Err(Suicide)
@@ -70,41 +75,41 @@ impl Board {
 
     }
 
-    pub fn get_snake_positions (&self) -> &Vec<Position> {
+    pub fn get_snake_vectors (&self) -> &Vec<Vector> {
         &self.snake.segments
     }
 
-    pub fn get_bullet_position (&self) -> &Position {
+    pub fn get_bullet_vector (&self) -> &Vector {
         &self.bullet
     }
 
 }
 
 struct Snake {
-    segments: Vec<Position>,
+    segments: Vec<Vector>,
     direction: Direction,
-    popped_segment: Position,
+    popped_segment: Vector,
 }
 
 impl Snake {
 
-    fn new (pos: Position) -> Snake {
+    fn new (pos: Vector) -> Snake {
         Snake {
             segments: vec!(pos),
             direction: Up,
-            popped_segment: Position { x: 0, y: 0 }
+            popped_segment: Vector { x: 0, y: 0 }
         }
     }
 
     fn step (&mut self) {
-        let new_head = self.segments[0].next(&self.direction);
+        let new_head = self.segments[0].next(self.direction);
         self.segments.insert(0, new_head);
         self.popped_segment = self.segments.pop().unwrap();
     }
 
-    fn hits_wall (&self, max_x: &i32, max_y: &i32) -> bool {
+    fn hits_wall (&self, bounds: Vector) -> bool {
         let head = self.segments[0];
-        head.x < 0 || head.x == *max_x || head.y < 0 || head.y == *max_y
+        head.x < 0 || head.x == bounds.x || head.y < 0 || head.y == bounds.y
     }
 
     fn hits_itself (&self) -> bool {
@@ -115,16 +120,8 @@ impl Snake {
         self.segments.push(self.popped_segment);
     }
 
-    fn eats_bullet (&self, bullet: Position) -> bool {
+    fn eats_bullet (&self, bullet: Vector) -> bool {
         self.segments[0] == bullet
     }
 
-}
-
-fn random_position (max_x: i32, max_y: i32) -> Position {
-    let mut rng = rand::task_rng();
-    Position {
-        x: rng.gen_range::<i32>(0, max_x),
-        y: rng.gen_range::<i32>(0, max_y),
-    }
 }
