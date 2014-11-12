@@ -30,8 +30,8 @@ impl Vector {
     fn random (bounds: Vector) -> Vector {
         let mut rng = rand::task_rng();
         Vector {
-            x: rng.gen_range::<i32>(0, bounds.x),
-            y: rng.gen_range::<i32>(0, bounds.y),
+            x: rng.gen_range::<>(0, bounds.x),
+            y: rng.gen_range::<>(0, bounds.y),
         }
     }
 }
