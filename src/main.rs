@@ -60,7 +60,7 @@ fn main()
 }
 
 fn draw_char (pos: &Position, c: char) {
-    mvaddch((*pos).y, (*pos).x, c as u32);
+    mvaddch(pos.y, pos.x, c as u32);
 }
 
 fn get_new_direction (prev_dir: Direction) -> Direction {

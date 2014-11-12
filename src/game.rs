@@ -14,15 +14,12 @@ pub struct Position {
 
 impl Position {
     fn next (&self, dir: &Direction) -> Position {
-        let mut dx = 0;
-        let mut dy = 0;
-
-        match *dir {
-            Up => dy -= 1,
-            Down => dy += 1,
-            Left => dx -= 1,
-            Right => dx += 1,
-        }
+        let (dx, dy) = match *dir {
+            Up => (0, -1),
+            Down => (0, 1),
+            Left => (-1, 0),
+            Right => (1, 0),
+        };
 
         Position {
             x: self.x + dx,
