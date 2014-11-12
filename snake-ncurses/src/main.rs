@@ -16,8 +16,6 @@ fn main()
     curs_set(CURSOR_INVISIBLE);
     timeout(100); // tick speed
 
-    //let mut screen_height = 0i32;
-    //let mut screen_width = 0i32;
     let mut bounds = Vector { x: 0, y: 0};
     getmaxyx(stdscr, &mut bounds.y, &mut bounds.x);
 
