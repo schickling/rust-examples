@@ -16,7 +16,7 @@ fn main()
     curs_set(CURSOR_INVISIBLE);
     timeout(100); // tick speed
 
-    let mut bounds = Vector { x: 0, y: 0};
+    let mut bounds = Vector { x: 0, y: 0 };
     getmaxyx(stdscr, &mut bounds.y, &mut bounds.x);
 
     let mut board = Board::new(bounds);

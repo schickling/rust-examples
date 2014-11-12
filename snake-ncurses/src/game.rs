@@ -75,8 +75,8 @@ impl Board {
 
     }
 
-    pub fn get_snake_vectors (&self) -> &Vec<Vector> {
-        &self.snake.segments
+    pub fn get_snake_vectors (&self) -> &[Vector] {
+        self.snake.segments.as_slice()
     }
 
     pub fn get_bullet_vector (&self) -> &Vector {
