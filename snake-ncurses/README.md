@@ -1,5 +1,5 @@
-rust-snake-ncurses
-==================
+snake-ncurses
+=============
 
 A terminal-based snake game implementation in Rust using ncurses
 
@@ -27,7 +27,7 @@ $ sudo apt-get install libncurses5-dev
 
 ## Screenshot
 
-![](https://raw.githubusercontent.com/schickling/rust-snake-ncurses/master/screenshot.png)
+![](https://raw.githubusercontent.com/schickling/rust-examples/master/snake-ncurses/screenshot.png)
 
 ## License
 
