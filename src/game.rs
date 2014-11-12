@@ -43,7 +43,7 @@ impl Board {
             width: width,
             height: height,
             snake: Snake::new(snake_pos),
-            bullet: random_position(&width, &height)
+            bullet: random_position(width, height)
         }
     }
 
@@ -57,7 +57,7 @@ impl Board {
 
         if self.snake.eats_bullet(self.bullet) {
             self.snake.grow();
-            self.bullet = random_position(&self.width, &self.height);
+            self.bullet = random_position(self.width, self.height);
         }
 
         if self.snake.hits_wall(&self.width, &self.height) {
@@ -121,10 +121,10 @@ impl Snake {
 
 }
 
-fn random_position (max_x: &i32, max_y: &i32) -> Position {
+fn random_position (max_x: i32, max_y: i32) -> Position {
     let mut rng = rand::task_rng();
     Position {
-        x: rng.gen_range::<i32>(0, *max_x),
-        y: rng.gen_range::<i32>(0, *max_y),
+        x: rng.gen_range::<i32>(0, max_x),
+        y: rng.gen_range::<i32>(0, max_y),
     }
 }
