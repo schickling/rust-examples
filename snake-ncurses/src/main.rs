@@ -2,6 +2,8 @@
 
 extern crate ncurses;
 
+use std::old_io::timer::sleep;
+use std::time::duration::Duration;
 use ncurses::*;
 use game::*;
 
@@ -13,7 +15,7 @@ fn main()
     cbreak(); // enable <Ctrl+C> to kill game
     noecho(); // don't show input
     keypad(stdscr, true); // make keys work
-    curs_set(CURSOR_INVISIBLE);
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     timeout(100); // tick speed
 
     let mut bounds = Vector { x: 0, y: 0 };
@@ -21,7 +23,7 @@ fn main()
 
     let mut board = Board::new(bounds);
 
-    let mut direction = Up;
+    let mut direction = Direction::Up;
 
     loop {
         erase();
@@ -45,10 +47,11 @@ fn main()
         match board.tick() {
             Err(err) => {
                 match err {
-                    Wall => show_text("You hit the wall, stupid."),
-                    Suicide => show_text("Damn it. Stop eating yourself."),
+                    GameError::Wall => show_text("You hit the wall, stupid."),
+                    GameError::Suicide => show_text("Damn it. Stop eating yourself."),
                 }
-                std::io::timer::sleep(std::time::duration::Duration::seconds(2));
+                let two_secs = Duration::seconds(2);
+                sleep(two_secs);
                 break;
             },
             Ok(_) => (),
@@ -59,15 +62,15 @@ fn main()
 }
 
 fn draw_char (pos: &Vector, c: char) {
-    mvaddch(pos.y, pos.x, c as u32);
+    mvaddch(pos.y, pos.x, c as u64);
 }
 
 fn get_new_direction (prev_dir: Direction) -> Direction {
     match getch() {
-        KEY_UP if prev_dir != Down => Up,
-        KEY_DOWN if prev_dir != Up => Down,
-        KEY_LEFT if prev_dir != Right => Left,
-        KEY_RIGHT if prev_dir != Left => Right,
+        KEY_UP if prev_dir != Direction::Down => Direction::Up,
+        KEY_DOWN if prev_dir != Direction::Up => Direction::Down,
+        KEY_LEFT if prev_dir != Direction::Right => Direction::Left,
+        KEY_RIGHT if prev_dir != Direction::Left => Direction::Right,
         _ => prev_dir,
     }
 }

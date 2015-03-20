@@ -3,10 +3,10 @@ use std::rand;
 
 pub enum GameError { Wall, Suicide }
 
-#[deriving(PartialEq)]
+#[derive(PartialEq,Copy)]
 pub enum Direction { Up, Down, Left, Right }
 
-#[deriving(PartialEq)]
+#[derive(PartialEq,Copy)]
 pub struct Vector {
     pub x: i32,
     pub y: i32,
@@ -15,10 +15,10 @@ pub struct Vector {
 impl Vector {
     fn next (&self, dir: Direction) -> Vector {
         let (dx, dy) = match dir {
-            Up => (0, -1),
-            Down => (0, 1),
-            Left => (-1, 0),
-            Right => (1, 0),
+            Direction::Up => (0, -1),
+            Direction::Down => (0, 1),
+            Direction::Left => (-1, 0),
+            Direction::Right => (1, 0),
         };
 
         Vector {
@@ -28,7 +28,7 @@ impl Vector {
     }
 
     fn random (bounds: Vector) -> Vector {
-        let mut rng = rand::task_rng();
+        let mut rng = rand::thread_rng();
         Vector {
             x: rng.gen_range::<>(0, bounds.x),
             y: rng.gen_range::<>(0, bounds.y),
@@ -66,9 +66,9 @@ impl Board {
         }
 
         if self.snake.hits_wall(self.bounds) {
-            Err(Wall)
+            Err(GameError::Wall)
         } else if self.snake.hits_itself() {
-            Err(Suicide)
+            Err(GameError::Suicide)
         } else {
             Ok(())
         }
@@ -96,7 +96,7 @@ impl Snake {
     fn new (pos: Vector) -> Snake {
         Snake {
             segments: vec!(pos),
-            direction: Up,
+            direction: Direction::Up,
             popped_segment: Vector { x: 0, y: 0 }
         }
     }

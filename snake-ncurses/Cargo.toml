@@ -1,9 +1,9 @@
 [package]
 
-name = "rust-snake-ncurses"
+name = "snake-ncurses"
 version = "0.0.1"
 authors = ["Johannes Schickling <schickling.j@gmail.com>"]
 
-[dependencies.ncurses]
+[dependencies]
 
-git = "https://github.com/jeaye/ncurses-rs.git"
+ncurses = "*"
