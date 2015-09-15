@@ -6,4 +6,5 @@ authors = ["Johannes Schickling <schickling.j@gmail.com>"]
 
 [dependencies]
 
-ncurses = "*"
+ncurses = "5.73.0"
+rand = "*"

@@ -1,13 +1,10 @@
-#![feature(globs)]
-
 extern crate ncurses;
 
-use std::old_io::timer::sleep;
-use std::time::duration::Duration;
+mod game;
+
 use ncurses::*;
 use game::*;
-
-mod game;
+use std::thread::sleep_ms as sleep;
 
 fn main()
 {
@@ -50,8 +47,7 @@ fn main()
                     GameError::Wall => show_text("You hit the wall, stupid."),
                     GameError::Suicide => show_text("Damn it. Stop eating yourself."),
                 }
-                let two_secs = Duration::seconds(2);
-                sleep(two_secs);
+                sleep(2000);
                 break;
             },
             Ok(_) => (),

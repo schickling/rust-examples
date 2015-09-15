@@ -1,9 +1,10 @@
-use std::rand::Rng;
-use std::rand;
+extern crate rand;
+
+use self::rand::Rng;
 
 pub enum GameError { Wall, Suicide }
 
-#[derive(PartialEq,Copy)]
+#[derive(PartialEq,Clone,Copy)]
 pub enum Direction { Up, Down, Left, Right }
 
 #[derive(PartialEq,Copy)]
@@ -27,6 +28,8 @@ impl Vector {
         }
     }
 
+
+
     fn random (bounds: Vector) -> Vector {
         let mut rng = rand::thread_rng();
         Vector {
@@ -34,6 +37,20 @@ impl Vector {
             y: rng.gen_range::<>(0, bounds.y),
         }
     }
+}
+
+
+impl Clone for Vector {
+
+    fn clone(&self) -> Self {
+        Vector { x : self.x, y : self.y}
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.x = source.x;
+        self.y = source.y;
+    }
+
 }
 
 pub struct Board {
@@ -76,7 +93,8 @@ impl Board {
     }
 
     pub fn get_snake_vectors (&self) -> &[Vector] {
-        self.snake.segments.as_slice()
+        let ref v = self.snake.segments;
+        &v[..]
     }
 
     pub fn get_bullet_vector (&self) -> &Vector {
