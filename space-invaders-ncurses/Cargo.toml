@@ -4,6 +4,7 @@ name = "space-invaders-ncurses"
 version = "0.0.1"
 authors = ["Johannes Schickling <schickling.j@gmail.com>"]
 
-[dependencies.ncurses]
 
-git = "https://github.com/jeaye/ncurses-rs.git"
+[dependencies]
+ncurses = "5.73.0"
+rand = "*"

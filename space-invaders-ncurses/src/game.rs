@@ -1,11 +1,13 @@
-use std::rand::Rng;
-use std::rand;
+extern crate rand;
 
+use self::rand::Rng;
+
+#[derive(PartialEq,Copy,Clone)]
 pub enum Direction { Up, Down, Left, Right }
 
 pub enum GameStatus { Win, Running, Dead }
 
-#[deriving(PartialEq)]
+#[derive(PartialEq,Copy,Clone)]
 pub struct Vector {
     pub x: i32,
     pub y: i32,
@@ -23,7 +25,8 @@ impl Game {
     pub fn new (bounds: Vector) -> Game {
 
         let mut invaders = vec!();
-        for i in range(0i32, bounds.x / 3) {
+        //for i in range(0i32, bounds.x / 3) {
+        for i in 0i32..(bounds.x / 3) {
             invaders.push(Invader::new( Vector { x: 2 * i, y: 0 }));
         }
 
@@ -51,14 +54,14 @@ impl Game {
             self.invaders.retain(|i| !bullet.check_collision(i.position));
 
             if bullet.check_collision(self.player.position) {
-                return Dead;
+                return GameStatus::Dead;
             }
         }
 
         if self.invaders.is_empty() {
-            Win
+            GameStatus::Win
         } else {
-            Running
+            GameStatus::Running
         }
 
     }
@@ -95,28 +98,29 @@ impl Invader {
     fn new (pos: Vector) -> Invader {
         Invader {
             position: pos,
-            direction: Left,
+            direction: Direction::Left,
         }
     }
 
     fn tick (&mut self, bounds: Vector) {
         let x = &mut self.position.x;
         self.direction = match self.direction {
-            Left if *x < 0 => Right,
-            Right if *x == bounds.x => Left,
-            _ => self.direction,
+            Direction::Left if *x < 0 => Direction::Right,
+            Direction::Right if *x == bounds.x => Direction::Left,
+            _ => self.direction.clone()
         };
         match self.direction {
-            Left => *x = *x - 1,
-            Right => *x = *x + 1,
+            Direction::Left => *x = *x - 1,
+            Direction::Right => *x = *x + 1,
             _ => (),
         };
     }
 
     fn give_chance_to_fire (&self) -> Option<Bullet> {
-        let mut rng = rand::task_rng();
-        if rng.gen_range::<f32>(0.0, 1.0) > 0.996 {
-            Some(Bullet::new(Vector { x: self.position.x, y: self.position.y + 1 }, Down))
+        let mut rng = rand::thread_rng();
+        let temp: f32 = rng.gen_range(0.0, 1.0);
+        if temp > 0.996 {
+            Some(Bullet::new(Vector { x: self.position.x, y: self.position.y + 1 }, Direction::Down))
         } else {
             None
         }
@@ -137,14 +141,14 @@ impl Player {
     fn shift (&mut self, dir: Direction, bounds: Vector) {
         let x = &mut self.position.x;
         match dir {
-            Left if *x > 0 => *x = *x - 1,
-            Right if *x < bounds.x - 1 => *x = *x + 1,
+            Direction::Left if *x > 0 => *x = *x - 1,
+            Direction::Right if *x < bounds.x - 1 => *x = *x + 1,
             _ => (),
         }
     }
 
     fn fire (&self) -> Bullet {
-        Bullet::new(Vector { x: self.position.x, y: self.position.y - 1 }, Up)
+        Bullet::new(Vector { x: self.position.x, y: self.position.y - 1 }, Direction::Up)
     }
 
 }
@@ -165,8 +169,8 @@ impl Bullet {
 
     fn tick (&mut self, bounds: Vector) {
         match self.direction {
-            Up => self.position.y -= 1,
-            Down => self.position.y += 1,
+            Direction::Up => self.position.y -= 1,
+            Direction::Down => self.position.y += 1,
             _ => (),
         };
         if self.position.y < 0 || self.position.y == bounds.y {
