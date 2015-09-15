@@ -1,9 +1,9 @@
-#![feature(globs)]
 
 extern crate ncurses;
 
 use ncurses::*;
 use game::*;
+use std::thread::sleep_ms as sleep;
 
 mod game;
 
@@ -13,13 +13,13 @@ fn main()
     cbreak(); // enable <Ctrl+C> to kill game
     noecho(); // don't show input
     keypad(stdscr, true); // make keys work
-    curs_set(CURSOR_INVISIBLE);
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     timeout(1);
 
     let mut bounds = Vector { x: 0, y: 0};
     getmaxyx(stdscr, &mut bounds.y, &mut bounds.x);
 
-    let mut game = box Game::new(bounds);
+    let mut game = Box::new(Game::new(bounds));
 
     // TODO rewrite async
     let mut tick_count = 0u8;
@@ -50,25 +50,25 @@ fn main()
         }
 
         match getch() {
-            KEY_LEFT => game.shift(Left),
-            KEY_RIGHT => game.shift(Right),
+            KEY_LEFT => game.shift(Direction::Left),
+            KEY_RIGHT => game.shift(Direction::Right),
             KEY_UP => game.fire(),
             _ => (),
         }
 
         if tick_count == 0 {
             match game.tick() {
-                Dead => {
+                GameStatus::Dead => {
                     show_text("You died. Shame on you!");
-                    std::io::timer::sleep(std::time::duration::Duration::seconds(2));
+                    sleep(2000);
                     break;
                 },
-                Win => {
+                GameStatus::Win => {
                     show_text("Wow. I didn't expect that.");
-                    std::io::timer::sleep(std::time::duration::Duration::seconds(2));
+                    sleep(2000);
                     break;
                 },
-                Running => (),
+                GameStatus::Running => (),
             };
         }
     }
@@ -77,7 +77,7 @@ fn main()
 }
 
 fn draw_char (pos: &Vector, c: char) {
-    mvaddch(pos.y, pos.x, c as u32);
+    mvaddch(pos.y, pos.x, c as u64);
 }
 
 fn show_text (s: &str) {
